@@ -1,0 +1,204 @@
+{
+  "nome": "Luis Rosa",
+  "idade": null,
+  "profissao": "Desenvolvedor / BeTre",
+  "renda_mensal": 7064.52,
+  "renda_principal": "MPS Informática",
+  "renda_liquida_principal_estimada": 5456.18,
+  "perfil_investidor": "conservador",
+  "objetivo_principal": "Reequilibrar o fluxo de caixa mensal, reduzir peso dos cartões e formar reserva antes de aumentar risco em investimentos.",
+  "patrimonio_total": null,
+  "reserva_emergencia_atual": null,
+  "aceita_risco": false,
+  "indicadores_mes_atual": {
+    "mes_analise": "2026-06",
+    "entradas_previstas": 7064.52,
+    "saidas_previstas": 9511.45,
+    "saldo_previsto": -2446.93,
+    "comprometimento_renda": 1.3464,
+    "cartoes_no_mes": 5389.49,
+    "percentual_cartoes_sobre_saidas": 0.5666,
+    "diagnostico": "Atenção: mês negativo"
+  },
+  "metas": [
+    {
+      "meta": "Cobrir saldo negativo do mês atual",
+      "valor_necessario": 2446.93,
+      "prazo": "2026-06"
+    },
+    {
+      "meta": "Reduzir cartões para no máximo 35% das saídas mensais",
+      "valor_necessario": 2060.48,
+      "prazo": "2026-06"
+    },
+    {
+      "meta": "Formar reserva de emergência inicial equivalente a 3 meses de saídas previstas",
+      "valor_necessario": 28534.35,
+      "prazo": "2027-06"
+    }
+  ],
+  "metas_por_categoria": [
+    {
+      "categoria": "Moradia",
+      "classificacao": "Essencial",
+      "meta_mensal": 1700.0,
+      "gasto_previsto": 1654.61,
+      "diferenca": 45.39,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Transporte",
+      "classificacao": "Essencial",
+      "meta_mensal": 2300.0,
+      "gasto_previsto": 2237.57,
+      "diferenca": 62.43,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Seguro",
+      "classificacao": "Essencial",
+      "meta_mensal": 178.49,
+      "gasto_previsto": 178.49,
+      "diferenca": 0.0,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Consórcio / Investimento",
+      "classificacao": "Importante",
+      "meta_mensal": 269.84,
+      "gasto_previsto": 269.84,
+      "diferenca": 0.0,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Educação",
+      "classificacao": "Importante",
+      "meta_mensal": 218.0,
+      "gasto_previsto": 218.0,
+      "diferenca": 0.0,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Alimentação",
+      "classificacao": "Cortável",
+      "meta_mensal": 600.0,
+      "gasto_previsto": 498.54,
+      "diferenca": 101.46,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Saúde",
+      "classificacao": "Importante",
+      "meta_mensal": 259.8,
+      "gasto_previsto": 259.8,
+      "diferenca": 0.0,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Assinaturas",
+      "classificacao": "Importante",
+      "meta_mensal": 258.2,
+      "gasto_previsto": 258.2,
+      "diferenca": 0.0,
+      "status": "Atenção",
+      "sugestao": "Acompanhar de perto"
+    },
+    {
+      "categoria": "Compras",
+      "classificacao": "Cortável",
+      "meta_mensal": 1000.0,
+      "gasto_previsto": 1652.07,
+      "diferenca": -652.07,
+      "status": "Estourou",
+      "sugestao": "Cortar/postergar gastos"
+    },
+    {
+      "categoria": "Impostos / Taxas",
+      "classificacao": "Essencial",
+      "meta_mensal": 100.0,
+      "gasto_previsto": 3.63,
+      "diferenca": 96.37,
+      "status": "Ok",
+      "sugestao": "Dentro da meta"
+    },
+    {
+      "categoria": "Cartão de Crédito",
+      "classificacao": "Cortável",
+      "meta_mensal": 200.0,
+      "gasto_previsto": 2280.7,
+      "diferenca": -2080.7,
+      "status": "Estourou",
+      "sugestao": "Cortar/postergar gastos"
+    },
+    {
+      "categoria": "Outros",
+      "classificacao": "Cortável",
+      "meta_mensal": 300.0,
+      "gasto_previsto": 0.0,
+      "diferenca": 300.0,
+      "status": "Sem gasto",
+      "sugestao": "Dentro da meta"
+    }
+  ],
+  "compromissos": [
+    {
+      "nome": "Financiamento do carro",
+      "categoria": "Transporte",
+      "valor_parcela": 1801.02,
+      "parcela_atual": 23,
+      "total_parcelas": 48,
+      "saldo_aproximado": 46826.52,
+      "termino_estimado": "2028-07-01",
+      "observacao": "Acompanhar"
+    },
+    {
+      "nome": "Casa",
+      "categoria": "Moradia",
+      "valor_parcela": 1654.61,
+      "parcela_atual": 5,
+      "total_parcelas": 420,
+      "saldo_aproximado": 688317.76,
+      "termino_estimado": "2061-01-01",
+      "observacao": "Compromisso longo: monitorar"
+    },
+    {
+      "nome": "Seguro do carro",
+      "categoria": "Seguro",
+      "valor_parcela": 178.49,
+      "parcela_atual": 23,
+      "total_parcelas": 48,
+      "saldo_aproximado": 4640.74,
+      "termino_estimado": "2028-07-01",
+      "observacao": "Baixo impacto futuro"
+    },
+    {
+      "nome": "Ademicon",
+      "categoria": "Consórcio / Investimento",
+      "valor_parcela": 269.84,
+      "parcela_atual": 2,
+      "total_parcelas": 220,
+      "saldo_aproximado": 59094.96,
+      "termino_estimado": "2044-08-01",
+      "observacao": "Compromisso longo: monitorar"
+    },
+    {
+      "nome": "Curso de Inglês",
+      "categoria": "Educação",
+      "valor_parcela": 218.0,
+      "parcela_atual": 10,
+      "total_parcelas": 24,
+      "saldo_aproximado": 3270.0,
+      "termino_estimado": "2027-08-01",
+      "observacao": "Baixo impacto futuro"
+    }
+  ],
+  "renda_principal_observacao": "Valor líquido de junho/2026 conforme Contas a receber; projeção com dissídio a partir de julho/2026.",
+  "renda_liquida_principal_com_dissidio_estimada": 5640.45
+}

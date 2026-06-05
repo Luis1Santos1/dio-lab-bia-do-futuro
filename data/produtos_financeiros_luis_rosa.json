@@ -1,0 +1,58 @@
+[
+  {
+    "nome": "Reserva de emergência em Tesouro Selic",
+    "categoria": "renda_fixa",
+    "risco": "baixo",
+    "rentabilidade": "Selic, com liquidez adequada para reserva",
+    "aporte_minimo": 30.0,
+    "indicado_para": "Primeira prioridade após equilibrar o mês; objetivo de pelo menos 3 meses de saídas previstas."
+  },
+  {
+    "nome": "CDB com liquidez diária",
+    "categoria": "renda_fixa",
+    "risco": "baixo",
+    "rentabilidade": "Percentual do CDI, preferencialmente com liquidez diária",
+    "aporte_minimo": 100.0,
+    "indicado_para": "Guardar sobras mensais e separar dinheiro de curto prazo sem travar liquidez."
+  },
+  {
+    "nome": "Caixa para faturas e compras anuais",
+    "categoria": "controle_financeiro",
+    "risco": "baixo",
+    "rentabilidade": "Evita juros e novas parcelas; retorno indireto por organização",
+    "aporte_minimo": 50.0,
+    "indicado_para": "Separar mensalmente valores de cartões, assinaturas e gastos recorrentes para reduzir pressão no vencimento."
+  },
+  {
+    "nome": "Antecipação ou renegociação de parcelas caras",
+    "categoria": "reducao_dividas",
+    "risco": "baixo",
+    "rentabilidade": "Economia de juros quando houver desconto ou custo efetivo maior que renda fixa",
+    "aporte_minimo": 0.0,
+    "indicado_para": "Avaliar após fechar junho/2026, principalmente se o cartão continuar acima de 35% das saídas."
+  },
+  {
+    "nome": "LCI/LCA pós-fixada",
+    "categoria": "renda_fixa",
+    "risco": "baixo",
+    "rentabilidade": "Percentual do CDI, geralmente isento de IR para pessoa física",
+    "aporte_minimo": 1000.0,
+    "indicado_para": "Somente para dinheiro sem necessidade imediata, após reserva e fluxo mensal ficarem positivos."
+  },
+  {
+    "nome": "Fundo multimercado conservador",
+    "categoria": "fundo",
+    "risco": "medio",
+    "rentabilidade": "Variável, normalmente buscando CDI+",
+    "aporte_minimo": 500.0,
+    "indicado_para": "Não prioritário agora; considerar apenas depois de estabilizar saldo, cartões e reserva."
+  },
+  {
+    "nome": "Fundo de ações / renda variável",
+    "categoria": "renda_variavel",
+    "risco": "alto",
+    "rentabilidade": "Variável, com foco em longo prazo",
+    "aporte_minimo": 100.0,
+    "indicado_para": "Evitar no curto prazo pelo diagnóstico de mês negativo; só avaliar após reserva consolidada."
+  }
+]
