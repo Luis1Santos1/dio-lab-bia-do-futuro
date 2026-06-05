@@ -2,54 +2,61 @@
 
 ## Dados Utilizados
 
-Descreva se usou os arquivos da pasta `data`, por exemplo:
+A base de conhecimento do agente foi construída a partir dos arquivos da pasta `data`, ajustados com base na planilha real de controle financeiro do Luis Rosa.
 
 | Arquivo | Formato | Utilização no Agente |
 |---------|---------|---------------------|
-| `historico_atendimento.csv` | CSV | Contextualizar interações anteriores |
-| `perfil_investidor.json` | JSON | Personalizar recomendações |
-| `produtos_financeiros.json` | JSON | Sugerir produtos adequados ao perfil |
-| `transacoes.csv` | CSV | Analisar padrão de gastos do cliente |
+| `historico_atendimento_luis_rosa.csv` | CSV | Contextualizar interações anteriores, preferências, objetivos financeiros e dúvidas recorrentes do usuário |
+| `perfil_investidor_luis_rosa.json` | JSON | Personalizar análises financeiras com base no perfil, renda, metas, compromissos e situação atual |
+| `produtos_financeiros_luis_rosa.json` | JSON | Apoiar recomendações financeiras compatíveis com o momento do usuário, priorizando organização, segurança e fluxo de caixa |
+| `transacoes_luis_rosa.csv` | CSV | Analisar entradas, contas fixas, despesas variáveis, cartão de crédito, categorias de gasto e evolução mensal |
 
 > [!TIP]
-> **Quer um dataset mais robusto?** Você pode utilizar datasets públicos do [Hugging Face](https://huggingface.co/datasets) relacionados a finanças, desde que sejam adequados ao contexto do desafio.
+> A base foi adaptada para representar um cenário financeiro pessoal realista, focado em controle de orçamento, organização de despesas, acompanhamento de metas e apoio à tomada de decisão financeira.
 
 ---
 
 ## Adaptações nos Dados
 
-> Você modificou ou expandiu os dados mockados? Descreva aqui.
+Os arquivos mockados originais foram modificados para refletir o caso real do Luis Rosa, utilizando como referência a planilha `CONTROLE FINANÇAS - LUIS ROSA`.
 
-[Sua descrição aqui]
+As principais adaptações realizadas foram:
+
+- Substituição do perfil fictício por um perfil financeiro personalizado do Luis Rosa.
+- Inclusão de renda mensal prevista, compromissos financeiros, metas e diagnóstico financeiro.
+- Geração de transações com base nas abas da planilha, como:
+  - Contas a receber;
+  - Contas a pagar;
+  - Descritivo dos cartões;
+  - Metas;
+  - Premissas financeiras;
+  - Dívidas e cenários.
+- Ajuste dos produtos financeiros para um contexto mais conservador e coerente com o momento atual do usuário.
+- Priorização de recomendações voltadas para:
+  - Controle de fluxo de caixa;
+  - Redução de gastos com cartão;
+  - Organização de contas fixas;
+  - Construção de reserva financeira;
+  - Evitar novos compromissos antes de estabilizar o orçamento.
+- Campos sem informação clara na planilha, como idade, patrimônio total e reserva atual, foram mantidos como `null` para evitar inferências incorretas.
 
 ---
 
 ## Estratégia de Integração
 
 ### Como os dados são carregados?
-> Descreva como seu agente acessa a base de conhecimento.
 
-[ex: Os JSON/CSV são carregados no início da sessão e incluídos no contexto do prompt]
+Os arquivos CSV e JSON são carregados a partir da pasta `data` no início da execução do agente.
 
-### Como os dados são usados no prompt?
-> Os dados vão no system prompt? São consultados dinamicamente?
+Os arquivos JSON são utilizados para recuperar informações estruturadas sobre o perfil financeiro do usuário e os produtos financeiros disponíveis.
 
-[Sua descrição aqui]
+Os arquivos CSV são utilizados para leitura tabular das transações e histórico de atendimento, permitindo análises por data, categoria, tipo de movimentação, descrição e valor.
 
----
+Exemplo de carregamento esperado:
 
-## Exemplo de Contexto Montado
-
-> Mostre um exemplo de como os dados são formatados para o agente.
-
-```
-Dados do Cliente:
-- Nome: João Silva
-- Perfil: Moderado
-- Saldo disponível: R$ 5.000
-
-Últimas transações:
-- 01/11: Supermercado - R$ 450
-- 03/11: Streaming - R$ 55
-...
-```
+```text
+/data
+├── historico_atendimento_luis_rosa.csv
+├── perfil_investidor_luis_rosa.json
+├── produtos_financeiros_luis_rosa.json
+└── transacoes_luis_rosa.csv
