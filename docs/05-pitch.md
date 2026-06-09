@@ -202,4 +202,6 @@ Mostre que o agente informa que a pergunta está fora do escopo financeiro.
 
 ## Link do Vídeo
 
-[Adicionar link do vídeo]
+[Assistir ou baixar o pitch do Finan](https://github.com/Luis1Santos1/dio-lab-bia-do-futuro/releases/download/v1.0.0/finan-pitch.mp4)
+
+[Ver a release completa](https://github.com/Luis1Santos1/dio-lab-bia-do-futuro/releases/tag/v1.0.0)

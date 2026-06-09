@@ -15,6 +15,10 @@ Na aplicação, a pessoa usuária pode:
 - receber alertas quando uma informação não estiver disponível;
 - usar IA local com Ollama e `gpt-oss`.
 
+**Vídeo do pitch:** [assistir ou baixar a demonstração](https://github.com/Luis1Santos1/dio-lab-bia-do-futuro/releases/download/v1.0.0/finan-pitch.mp4)
+
+**Release da entrega:** [Finan v1.0.0](https://github.com/Luis1Santos1/dio-lab-bia-do-futuro/releases/tag/v1.0.0)
+
 ## Problema
 
 Planilhas financeiras armazenam dados, mas nem sempre ajudam uma pessoa a tomar decisões. É comum não saber onde o dinheiro está sendo gasto, se o cartão está comprometendo o orçamento ou se existe sobra real para uma nova compra ou investimento.
