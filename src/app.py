@@ -18,13 +18,22 @@ try:
 except ImportError:
     OpenAI = None
 
+if load_dotenv:
+    load_dotenv()
+
 
 # ============================================================
 # CONFIGURAÇÕES GERAIS
 # ============================================================
 
 APP_TITLE = "Assistente Financeiro | Luis Rosa"
-DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama").strip().lower()
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gpt-oss")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+DEFAULT_MODEL = OLLAMA_MODEL if LLM_PROVIDER == "ollama" else OPENAI_MODEL
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "300"))
+OLLAMA_REASONING_EFFORT = os.getenv("OLLAMA_REASONING_EFFORT", "none")
 
 # A aplicação aceita tanto os nomes originais do desafio quanto os arquivos ajustados.
 FILE_CANDIDATES = {
@@ -196,6 +205,11 @@ def prepare_transactions(df: pd.DataFrame) -> pd.DataFrame:
     if "descricao" not in prepared.columns:
         prepared["descricao"] = ""
 
+    if "data" in prepared.columns:
+        prepared["data_dt"] = pd.to_datetime(prepared["data"], errors="coerce")
+    else:
+        prepared["data_dt"] = pd.NaT
+
     prepared["tipo_norm"] = prepared["tipo"].apply(normalize_text)
     prepared["categoria_norm"] = prepared["categoria"].apply(normalize_text)
     prepared["descricao_norm"] = prepared["descricao"].apply(normalize_text)
@@ -205,9 +219,17 @@ def prepare_transactions(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_financial_summary(perfil: Dict[str, Any], transacoes: pd.DataFrame) -> Dict[str, Any]:
     df = prepare_transactions(transacoes)
+    indicadores = perfil.get("indicadores_mes_atual", {}) if isinstance(perfil, dict) else {}
+    mes_analise = indicadores.get("mes_analise")
+
+    if mes_analise and not df.empty and df["data_dt"].notna().any():
+        try:
+            periodo = pd.Period(mes_analise, freq="M")
+            df = df[df["data_dt"].dt.to_period("M") == periodo]
+        except ValueError:
+            pass
 
     if df.empty:
-        indicadores = perfil.get("indicadores_mes_atual", {}) if isinstance(perfil, dict) else {}
         return {
             "entradas": indicadores.get("entradas_previstas", 0),
             "saidas": indicadores.get("saidas_previstas", 0),
@@ -216,6 +238,7 @@ def build_financial_summary(perfil: Dict[str, Any], transacoes: pd.DataFrame) ->
             "top_categorias": [],
             "top_despesas": [],
             "diagnostico": indicadores.get("diagnostico", "Sem diagnóstico calculado"),
+            "mes_analise": mes_analise,
         }
 
     entradas_df = df[df["tipo_norm"].isin(["entrada", "receita", "receber"])]
@@ -261,7 +284,34 @@ def build_financial_summary(perfil: Dict[str, Any], transacoes: pd.DataFrame) ->
         "top_categorias": top_categorias,
         "top_despesas": top_despesas,
         "diagnostico": diagnostico,
+        "mes_analise": mes_analise,
     }
+
+
+def format_reference_month(value: Optional[str]) -> str:
+    if not value:
+        return "mês analisado"
+
+    try:
+        date = pd.Period(value, freq="M").to_timestamp()
+    except ValueError:
+        return value
+
+    month_names = [
+        "janeiro",
+        "fevereiro",
+        "março",
+        "abril",
+        "maio",
+        "junho",
+        "julho",
+        "agosto",
+        "setembro",
+        "outubro",
+        "novembro",
+        "dezembro",
+    ]
+    return f"{month_names[date.month - 1]} de {date.year}"
 
 
 def get_goals(perfil: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -384,9 +434,6 @@ Estrutura recomendada quando fizer análise:
 
 
 def get_openai_client() -> Optional[Any]:
-    if load_dotenv:
-        load_dotenv()
-
     api_key = os.getenv("OPENAI_API_KEY")
 
     if not api_key or OpenAI is None:
@@ -395,8 +442,26 @@ def get_openai_client() -> Optional[Any]:
     return OpenAI(api_key=api_key)
 
 
+def get_llm_client() -> Tuple[Optional[Any], str, str]:
+    if OpenAI is None:
+        return None, DEFAULT_MODEL, LLM_PROVIDER
+
+    if LLM_PROVIDER == "ollama":
+        client = OpenAI(
+            base_url=OLLAMA_BASE_URL,
+            api_key=os.getenv("OLLAMA_API_KEY", "ollama"),
+        )
+        return client, OLLAMA_MODEL, "ollama"
+
+    if LLM_PROVIDER == "openai":
+        client = get_openai_client()
+        return client, OPENAI_MODEL, "openai"
+
+    return None, DEFAULT_MODEL, LLM_PROVIDER
+
+
 def generate_llm_answer(question: str, context: str, history: List[Dict[str, str]]) -> Optional[str]:
-    client = get_openai_client()
+    client, model, _provider = get_llm_client()
 
     if client is None:
         return None
@@ -407,17 +472,32 @@ def generate_llm_answer(question: str, context: str, history: List[Dict[str, str
     ]
 
     # Mantém apenas as últimas mensagens para evitar contexto grande demais.
-    for item in history[-8:]:
+    recent_history = history[-8:]
+    if (
+        recent_history
+        and recent_history[-1].get("role") == "user"
+        and recent_history[-1].get("content") == question
+    ):
+        recent_history = recent_history[:-1]
+
+    for item in recent_history:
         if item.get("role") in ["user", "assistant"]:
             messages.append({"role": item["role"], "content": item.get("content", "")})
 
     messages.append({"role": "user", "content": question})
 
-    response = client.chat.completions.create(
-        model=DEFAULT_MODEL,
-        messages=messages,
-        temperature=0.2,
-    )
+    request_options = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0,
+        "max_tokens": LLM_MAX_TOKENS,
+        "timeout": 120,
+    }
+
+    if LLM_PROVIDER == "ollama":
+        request_options["reasoning_effort"] = OLLAMA_REASONING_EFFORT
+
+    response = client.chat.completions.create(**request_options)
 
     return response.choices[0].message.content
 
@@ -425,6 +505,36 @@ def generate_llm_answer(question: str, context: str, history: List[Dict[str, str
 def fallback_answer(question: str, perfil: Dict[str, Any], summary: Dict[str, Any]) -> str:
     q = normalize_text(question)
     metas = get_goals(perfil)
+
+    if any(term in q for term in ["senha", "credencial", "token", "dados bancarios de terceiros"]):
+        return """
+Não tenho acesso a senhas, credenciais ou dados bancários sensíveis e não posso solicitar, armazenar ou compartilhar esse tipo de informação.
+
+Posso ajudar apenas com a organização financeira usando os dados já registrados na base local.
+""".strip()
+
+    if any(
+        term in q
+        for term in [
+            "previsao do tempo",
+            "clima",
+            "treino de academia",
+            "receita de comida",
+            "resultado do jogo",
+        ]
+    ):
+        return """
+Meu escopo é a organização financeira pessoal. Não tenho informações confiáveis na base para responder a essa pergunta.
+
+Posso ajudar a analisar gastos, cartão, metas, fluxo de caixa e planejamento financeiro.
+""".strip()
+
+    if any(term in q for term in ["patrimonio total", "saldo bancario atual", "saldo em conta hoje"]):
+        return """
+Essa informação não consta de forma confiável na base disponível, por isso não vou estimar ou inventar um valor.
+
+Para calcular o patrimônio ou saldo atual, seriam necessários dados atualizados de contas, investimentos, bens e dívidas.
+""".strip()
 
     if any(term in q for term in ["cartao", "fatura", "credito"]):
         percentual = 0
@@ -568,6 +678,42 @@ Comece perguntando algo como:
 """.strip()
 
 
+def should_use_local_answer(question: str) -> bool:
+    q = normalize_text(question)
+    local_terms = [
+        "situacao financeira",
+        "saldo",
+        "mes",
+        "cartao",
+        "fatura",
+        "credito",
+        "investir",
+        "investimento",
+        "aplicar",
+        "tesouro",
+        "cdb",
+        "gasto",
+        "categoria",
+        "maiores",
+        "meta",
+        "guardar",
+        "reserva",
+        "objetivo",
+        "senha",
+        "credencial",
+        "token",
+        "previsao do tempo",
+        "clima",
+        "treino de academia",
+        "receita de comida",
+        "resultado do jogo",
+        "patrimonio total",
+        "saldo bancario atual",
+        "saldo em conta hoje",
+    ]
+    return any(term in q for term in local_terms)
+
+
 def answer_question(
     question: str,
     perfil: Dict[str, Any],
@@ -575,18 +721,16 @@ def answer_question(
     context: str,
     history: List[Dict[str, str]],
 ) -> str:
+    if should_use_local_answer(question):
+        return fallback_answer(question, perfil, summary)
+
     try:
         llm_answer = generate_llm_answer(question, context, history)
         if llm_answer:
             return llm_answer
     except Exception as exc:
         return f"""
-Não consegui consultar a LLM neste momento.
-
-Erro retornado:
-`{exc}`
-
-Mesmo assim, segue uma análise local com base nos dados carregados:
+A LLM local não respondeu dentro do tempo esperado. Mesmo assim, segue uma análise segura com base nos dados carregados:
 
 {fallback_answer(question, perfil, summary)}
 """.strip()
@@ -608,7 +752,16 @@ def render_sidebar(paths: Dict[str, Optional[Path]], perfil: Dict[str, Any], sum
             st.sidebar.error(f"{key}: arquivo não encontrado")
 
     st.sidebar.divider()
-    st.sidebar.subheader("Resumo do mês")
+    st.sidebar.subheader("LLM")
+    st.sidebar.write(f"**Provedor:** {LLM_PROVIDER}")
+    st.sidebar.write(f"**Modelo:** {DEFAULT_MODEL}")
+
+    if LLM_PROVIDER == "ollama":
+        st.sidebar.caption(f"Ollama: {OLLAMA_BASE_URL}")
+
+    st.sidebar.divider()
+    reference_month = format_reference_month(summary.get("mes_analise"))
+    st.sidebar.subheader(f"Resumo de {reference_month}")
 
     st.sidebar.metric("Entradas", format_currency(summary.get("entradas", 0)))
     st.sidebar.metric("Saídas", format_currency(summary.get("saidas", 0)))
@@ -624,6 +777,9 @@ def render_sidebar(paths: Dict[str, Optional[Path]], perfil: Dict[str, Any], sum
 
 
 def render_dashboard(summary: Dict[str, Any]) -> None:
+    reference_month = format_reference_month(summary.get("mes_analise"))
+    st.caption(f"Período analisado: {reference_month}")
+
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric("Entradas", format_currency(summary.get("entradas", 0)))

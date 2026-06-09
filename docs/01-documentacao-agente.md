@@ -1,120 +1,87 @@
 # Documentação do Agente
 
-## Caso de Uso
+## Identidade
 
-### Problema
-> Qual problema financeiro seu agente resolve?
+- **Nome:** Finan
+- **Tipo:** Assistente financeiro pessoal
+- **Idioma:** Português do Brasil
+- **Tom:** direto, educativo, acessível e sem julgamentos
 
-O agente resolve problemas relacionados à organização financeira pessoal, controle de gastos, acompanhamento de receitas e despesas, planejamento financeiro e análise de hábitos de consumo.
+## Problema
 
-Muitas pessoas possuem dificuldade em visualizar para onde o dinheiro está indo, controlar despesas recorrentes, acompanhar metas financeiras e manter uma rotina financeira saudável.
+Pessoas que usam planilhas financeiras nem sempre conseguem transformar os registros em decisões. Elas precisam entender rapidamente:
 
-### Solução
-> Como o agente resolve esse problema de forma proativa?
+- se o mês fecha positivo ou negativo;
+- quais categorias concentram os gastos;
+- quanto o cartão pesa no orçamento;
+- se existe margem para novas compras, metas ou investimentos.
 
-O agente atua como um assistente financeiro pessoal, ajudando o usuário a:
+## Solução
 
-- Registrar receitas e despesas
-- Categorizar gastos
-- Acompanhar saldo e fluxo de caixa
-- Identificar excessos e padrões de consumo
-- Gerar análises e resumos financeiros
-- Auxiliar no planejamento financeiro mensal
-- Alertar sobre gastos fora do padrão
-- Acompanhar metas financeiras
+O Finan lê uma base local, calcula indicadores financeiros e responde perguntas em linguagem natural. O agente não altera os dados nem realiza transações; seu papel é analisar o cenário registrado e sugerir próximos passos prudentes.
 
-O agente responde de forma prática, clara e orientada à tomada de decisão financeira.
+## Público-Alvo
 
-### Público-Alvo
-> Quem vai usar esse agente?
+- Pessoas que desejam organizar o orçamento mensal.
+- Usuários que já registram despesas, mas têm dificuldade de interpretação.
+- Pessoas que querem acompanhar cartão, compromissos e metas.
+- Iniciantes em educação financeira.
 
-- Pessoas que desejam organizar suas finanças pessoais
-- Usuários que querem controlar gastos e orçamento mensal
-- Pessoas que desejam melhorar hábitos financeiros
-- Usuários que precisam de auxílio no planejamento financeiro pessoal
+## Capacidades
 
----
-
-## Persona e Tom de Voz
-
-### Nome do Agente
-Finan
-
-### Personalidade
-> Como o agente se comporta? (ex: consultivo, direto, educativo)
-
-O agente possui comportamento:
-
-- Organizado
-- Analítico
-- Direto
-- Educativo
-- Proativo
-- Objetivo
-
-Ele ajuda o usuário a entender melhor sua situação financeira sem julgamentos, focando em clareza e tomada de decisão.
-
-### Tom de Comunicação
-> Formal, informal, técnico, acessível?
-
-- Acessível
-- Claro
-- Profissional
-- Conversacional
-- Sem excesso de termos técnicos
-
-### Exemplos de Linguagem
-- Saudação: "Olá! Vamos organizar suas finanças hoje?"
-- Confirmação: "Entendi. Vou analisar seus gastos e gerar um resumo para você."
-- Erro/Limitação: "Não encontrei dados suficientes para essa análise no momento, mas posso ajudar com o controle das suas despesas."
-
----
+- Calcular entradas, saídas e saldo do mês.
+- Identificar maiores categorias de gasto.
+- Analisar o peso do cartão.
+- Consultar metas e compromissos registrados.
+- Orientar a priorização do fluxo de caixa.
+- Explicar quando não há dados suficientes.
+- Recusar perguntas fora do escopo e pedidos sensíveis.
 
 ## Arquitetura
 
-### Diagrama
-
 ```mermaid
 flowchart TD
-    A[Usuário] -->|Mensagem| B[Interface]
-    B --> C[LLM]
-    C --> D[Base Financeira]
-    D --> C
-    C --> E[Processamento e Regras]
-    E --> F[Resposta Financeira]
+    A[Pessoa usuária] --> B[Interface Streamlit]
+    B --> C[Processamento financeiro com Pandas]
+    C --> D[Base local CSV e JSON]
+    C --> E[Resumo financeiro calculado]
+    E --> F[Contexto controlado]
+    F --> G[Ollama com gpt-oss]
+    G --> H[Resposta consultiva]
+    G -. indisponível .-> I[Fallback local]
 ```
 
-### Componentes
-
-| Componente | Descrição |
-|------------|-----------|
-| Interface | Chatbot Web ou Mobile |
-| LLM | GPT via API |
-| Base Financeira | Banco de dados com receitas, despesas, categorias e metas |
-| Processamento | Regras de análise financeira e categorização |
-| Relatórios | Geração de resumos e análises financeiras |
-
----
+| Componente | Responsabilidade |
+|---|---|
+| Streamlit | Dashboard e chat |
+| Pandas | Leitura, filtro mensal e cálculos |
+| CSV/JSON | Base de conhecimento |
+| Ollama | Execução local da LLM |
+| `gpt-oss` | Geração da resposta em linguagem natural |
+| Fallback | Respostas essenciais sem dependência da LLM |
 
 ## Segurança e Anti-Alucinação
 
-### Estratégias Adotadas
+- Os totais financeiros são calculados pelo código.
+- O agente não inventa valores, datas, patrimônio ou saldo atual.
+- Informações ausentes são declaradas como indisponíveis.
+- Senhas, tokens e credenciais são recusados.
+- Perguntas fora de finanças pessoais são recusadas.
+- O agente não promete rentabilidade.
+- Investimentos não são priorizados quando o fluxo de caixa está negativo.
+- Os dados não são tratados como informação bancária em tempo real.
 
-- [x] O agente responde apenas com base nos dados financeiros disponíveis
-- [x] O agente evita inventar valores ou movimentações financeiras
-- [x] Quando não possui informação suficiente, informa claramente a limitação
-- [x] O agente não realiza operações bancárias
-- [x] O agente não faz recomendações financeiras avançadas ou investimentos sem contexto adequado
+## Limitações
 
-### Limitações Declaradas
-> O que o agente NÃO faz?
+O Finan não:
 
-O agente NÃO:
+- acessa contas bancárias;
+- realiza pagamentos ou investimentos;
+- cadastra transações pela interface atual;
+- substitui profissionais de finanças, contabilidade ou direito;
+- fornece garantias de retorno;
+- conhece fatos que não estejam na base ou no contexto fornecido.
 
-- Realiza movimentações bancárias
-- Faz investimentos automaticamente
-- Acessa contas bancárias sem autorização
-- Substitui consultoria financeira profissional
-- Garante ganhos financeiros
-- Toma decisões financeiras pelo usuário
-- Fornece aconselhamento jurídico ou tributário
+## Critério de Sucesso
+
+O agente é considerado útil quando responde com números coerentes com a base, deixa claros os riscos do cenário, evita afirmar informações ausentes e propõe uma próxima ação prática.

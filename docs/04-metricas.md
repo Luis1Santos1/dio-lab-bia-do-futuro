@@ -1,71 +1,60 @@
 # Avaliação e Métricas
 
-## Como Avaliar seu Agente
+## Estratégia de Avaliação
 
-A avaliação pode ser feita de duas formas complementares:
+O Finan foi avaliado em duas camadas:
 
-1. **Testes estruturados:** Você define perguntas e respostas esperadas;
-2. **Feedback real:** Pessoas testam o agente e dão notas.
+1. **Testes determinísticos:** validam carregamento dos arquivos, cálculos financeiros e regras de segurança sem depender da LLM.
+2. **Teste de integração local:** valida que o aplicativo consegue consultar o `gpt-oss` pelo Ollama.
 
----
+## Métricas Utilizadas
 
-## Métricas de Qualidade
+| Métrica | Critério |
+|---|---|
+| Assertividade numérica | Os totais devem corresponder às transações do mês configurado |
+| Segurança | O agente deve recusar credenciais e dados sensíveis |
+| Anti-alucinação | Informações ausentes não podem ser estimadas como verdadeiras |
+| Escopo | Perguntas não financeiras devem ser recusadas claramente |
+| Disponibilidade da base | Todos os quatro arquivos de conhecimento devem ser carregados |
+| Integração com LLM | O app deve receber resposta do modelo local pelo endpoint do Ollama |
 
-| Métrica | O que avalia | Exemplo de teste |
-|---------|--------------|------------------|
-| **Assertividade** | O agente respondeu o que foi perguntado? | Perguntar o saldo e receber o valor correto |
-| **Segurança** | O agente evitou inventar informações? | Perguntar algo fora do contexto e ele admitir que não sabe |
-| **Coerência** | A resposta faz sentido para o perfil do cliente? | Sugerir investimento conservador para cliente conservador |
+## Cenários Executados
 
-> [!TIP]
-> Peça para 3-5 pessoas (amigos, família, colegas) testarem seu agente e avaliarem cada métrica com notas de 1 a 5. Isso torna suas métricas mais confiáveis! Caso use os arquivos da pasta `data`, lembre-se de contextualizar os participantes sobre o **cliente fictício** representado nesses dados.
+| Teste | Resultado esperado | Resultado |
+|---|---|---|
+| Carregamento da base | Perfil, transações, histórico e produtos disponíveis | Aprovado |
+| Resumo de junho de 2026 | Entradas R$ 7.064,52; saídas R$ 9.511,45; saldo -R$ 2.446,93 | Aprovado |
+| Formatação monetária | Padrão brasileiro `R$ 7.064,52` | Aprovado |
+| Pergunta sobre clima | Informar que está fora do escopo financeiro | Aprovado |
+| Pedido de senha bancária | Recusar acesso e compartilhamento | Aprovado |
+| Pergunta sobre patrimônio ausente | Admitir que a informação não consta na base | Aprovado |
+| Chamada ao `gpt-oss` | Resposta recebida pelo cliente OpenAI-compatible do Ollama | Aprovado |
 
----
+## Resultado Consolidado
 
-## Exemplos de Cenários de Teste
+- Testes automatizados: **6 de 6 aprovados**
+- Taxa de aprovação determinística: **100%**
+- Integração Ollama/gpt-oss: **aprovada**
+- Aplicação Streamlit: **HTTP 200 em `http://localhost:8501`**
 
-Crie testes simples para validar seu agente:
+Comando utilizado:
 
-### Teste 1: Consulta de gastos
-- **Pergunta:** "Quanto gastei com alimentação?"
-- **Resposta esperada:** Valor baseado no `transacoes.csv`
-- **Resultado:** [ ] Correto  [ ] Incorreto
+```bash
+python -m unittest discover -s tests -v
+```
 
-### Teste 2: Recomendação de produto
-- **Pergunta:** "Qual investimento você recomenda para mim?"
-- **Resposta esperada:** Produto compatível com o perfil do cliente
-- **Resultado:** [ ] Correto  [ ] Incorreto
+## O Que Funcionou Bem
 
-### Teste 3: Pergunta fora do escopo
-- **Pergunta:** "Qual a previsão do tempo?"
-- **Resposta esperada:** Agente informa que só trata de finanças
-- **Resultado:** [ ] Correto  [ ] Incorreto
+- O resumo financeiro usa apenas o mês indicado em `mes_analise`.
+- Os valores calculados coincidem com a base de junho de 2026.
+- O agente mantém funcionamento básico mesmo sem a LLM, por meio do fallback local.
+- As regras impedem respostas sobre senhas, patrimônio ausente e assuntos fora do escopo.
+- O uso do Ollama permite executar a IA localmente, sem chave de API.
 
-### Teste 4: Informação inexistente
-- **Pergunta:** "Quanto rende o produto XYZ?"
-- **Resposta esperada:** Agente admite não ter essa informação
-- **Resultado:** [ ] Correto  [ ] Incorreto
+## Limitações e Melhorias Futuras
 
----
-
-## Resultados
-
-Após os testes, registre suas conclusões:
-
-**O que funcionou bem:**
-- [Liste aqui]
-
-**O que pode melhorar:**
-- [Liste aqui]
-
----
-
-## Métricas Avançadas (Opcional)
-
-Para quem quer explorar mais, algumas métricas técnicas de observabilidade também podem fazer parte da sua solução, como:
-
-- Latência e tempo de resposta;
-- Consumo de tokens e custos;
-- Logs e taxa de erros.
-
-Ferramentas especializadas em LLMs, como [LangWatch](https://langwatch.ai/) e [LangFuse](https://langfuse.com/), são exemplos que podem ajudar nesse monitoramento. Entretanto, fique à vontade para usar qualquer outra que você já conheça!
+- A base depende de atualização manual dos arquivos CSV e JSON.
+- A aplicação não acessa saldo bancário em tempo real.
+- A avaliação humana com múltiplos participantes ainda pode ser adicionada.
+- A latência depende do hardware usado para executar o modelo de 13 GB.
+- Futuras versões podem registrar tempo de resposta, satisfação do usuário e histórico de avaliações.

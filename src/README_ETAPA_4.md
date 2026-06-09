@@ -1,66 +1,63 @@
-# Etapa 4 — Aplicação Funcional
+# Etapa 4 - Aplicacao Funcional
 
-Este arquivo implementa um protótipo funcional do agente financeiro pessoal do Luis Rosa usando Streamlit.
+Este projeto entrega um prototipo funcional de um agente financeiro pessoal usando Streamlit, dados locais e LLM local via Ollama.
 
-## O que a aplicação entrega
+## Entregas da aplicacao
 
 - Chatbot interativo em Streamlit.
-- Carregamento da base de conhecimento da pasta `data`.
-- Leitura de arquivos CSV e JSON.
-- Análise de entradas, saídas, saldo previsto, cartão e categorias.
-- Integração opcional com LLM via OpenAI.
-- Fallback local baseado em regras caso não exista `OPENAI_API_KEY`.
+- Dashboard com entradas, saidas, saldo previsto e cartao.
+- Leitura da base de conhecimento em CSV e JSON.
+- Analise de categorias de gasto e metas financeiras.
+- Integracao padrao com Ollama usando modelo `gpt-oss`.
+- Fallback local baseado em regras caso o Ollama esteja indisponivel.
 
 ## Estrutura esperada
 
 ```text
 .
-├── data
-│   ├── historico_atendimento_luis_rosa.csv
-│   ├── perfil_investidor_luis_rosa.json
-│   ├── produtos_financeiros_luis_rosa.json
-│   └── transacoes_luis_rosa.csv
-├── src
-│   └── app.py
-├── requirements.txt
-└── .env.example
+|-- data
+|   |-- historico_atendimento_luis_rosa.csv
+|   |-- perfil_investidor_luis_rosa.json
+|   |-- produtos_financeiros_luis_rosa.json
+|   `-- transacoes_luis_rosa.csv
+|-- src
+|   |-- app.py
+|   |-- README.md
+|   `-- requirements.txt
+|-- .env.example
+`-- README.md
 ```
 
-A aplicação também aceita os nomes originais do desafio:
-
-```text
-historico_atendimento.csv
-perfil_investidor.json
-produtos_financeiros.json
-transacoes.csv
-```
-
-## Como executar
-
-Instale as dependências:
+## Como executar com Ollama
 
 ```bash
-pip install -r requirements.txt
-```
-
-Execute o app:
-
-```bash
+pip install -r src/requirements.txt
+ollama pull gpt-oss
 streamlit run src/app.py
 ```
 
-## Uso com LLM
-
-Para usar a integração com LLM, crie um arquivo `.env` na raiz do projeto:
+Se necessario, crie um arquivo `.env` na raiz:
 
 ```env
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434/v1
+OLLAMA_MODEL=gpt-oss
+```
+
+Caso o modelo local tenha tag, ajuste `OLLAMA_MODEL`, por exemplo:
+
+```env
+OLLAMA_MODEL=gpt-oss:20b
+```
+
+## OpenAI como alternativa
+
+```env
+LLM_PROVIDER=openai
 OPENAI_API_KEY=sua_chave_aqui
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-Sem a chave, o app continua funcionando com respostas locais baseadas nos dados carregados.
+## Observacao
 
-## Observação
-
-Este protótipo não acessa banco, internet banking ou saldo bancário em tempo real.
-Ele usa somente os arquivos da pasta `data`.
+O prototipo nao acessa banco, internet banking ou saldo bancario em tempo real. Ele usa somente os arquivos da pasta `data` e deixa claro quando uma informacao nao existe na base.
